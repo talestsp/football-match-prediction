@@ -1,0 +1,4 @@
+Please, place the CSVs datafiles here: data/raw/
+
+Source
+https://www.kaggle.com/competitions/football-match-probability-prediction/data
