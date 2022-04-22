@@ -15,6 +15,8 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
     * stats.py
 
 * notebooks/
+  * (DataUnderstanding.ipynb)[notebooks/DataUnderstanding.ipynb]
+  * (SplitData.ipynb)[notebooks/SplitData.ipynb]
 
 # Data Types
 * Schema
