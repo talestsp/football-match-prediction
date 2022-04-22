@@ -24,6 +24,6 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * Boolean data types that we originally filled with 1 and 0 were parsed to True and False
 
 # Train, Test and Validation split
-The adopted strategy for splitting train and validation datasets can be found at SplitData.ipynb notebook. As the test dataset represents a slice made in time, the validation dataset was splitted in the same way.
+The adopted strategy for splitting train and validation datasets can be found at [SplitData.ipynb](notebooks/SplitData.ipynb) notebook. As the test dataset represents a slice made in time, the validation dataset was splitted in the same way.
 The 20% most recent data from training was partitioned to validation dataset.
 
