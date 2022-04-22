@@ -51,7 +51,7 @@ def build_schema(schema_dict, colnames_order, nullable=True):
 def _parse_numeric_to_bool(df, colnames_to_parse):
     for colname in colnames_to_parse:
         df = df.withColumn(colname,
-                           df[colname].cast("boolean"))
+                           df[colname] == 1.0)
 
     return df
 
