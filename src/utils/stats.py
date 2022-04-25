@@ -46,16 +46,13 @@ def row_mean(df, colnames, row_mean_colname, index_colname):
         [index_colname, row_mean_colname])
     return mean_df
 
-
 def describe(df, colname, round_n=None):
-    min_v = df.select(f.min(df[colname]).alias("min"))
-    q25_v = df.select(f.percentile_approx(df[colname], 0.25).alias("q_25"))
-    median_v = df.select(f.percentile_approx(df[colname], 0.50).alias("median"))
-    q75_v = df.select(f.percentile_approx(df[colname], 0.75).alias("q_75"))
-    max_v = df.select(f.max(df[colname]).alias("max"))
-    mean_v = df.select(f.mean(df[colname]).alias("mean"))
-
-    describe_df = mean_v.join(min_v, how="inner").join(q25_v, how="inner").join(median_v, how="inner").join(q75_v, how="inner").join(max_v, how="inner")
+    describe_df = df.agg(f.min(df[colname]).alias("min"),
+                      f.percentile_approx(df[colname], 0.25).alias("q_25"),
+                      f.percentile_approx(df[colname], 0.50).alias("median"),
+                      f.percentile_approx(df[colname], 0.75).alias("q_75"),
+                      f.max(df[colname]).alias("max"),
+                      f.mean(df[colname]).alias("mean"))
 
     if round_n:
         describe_df = dflib.round_cols(describe_df, describe_df.columns, round_n=2)
