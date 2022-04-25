@@ -22,7 +22,7 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
 * notebooks/
   * [DataUnderstanding.ipynb](notebooks/DataUnderstanding.ipynb)
   * [SplitData.ipynb](notebooks/SplitData.ipynb)
-  * [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis)
+  * [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb)
 
 # Data Types
 * Schema
