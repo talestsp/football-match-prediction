@@ -49,4 +49,4 @@ Finally, both `home_mood_diff` and `away_mood_diff` were created.
 
 Yes, it doesn't need to use both to fit the model, picking one of them is enough since each one synthesizes both sides.
 
-Please, check out the [TeamMood.ipynb](notebooks/TeamMoodAnalysis.ipynb) notebook for the evaluaation of this potential good feature.
+Please, check out the [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb) notebook for the evaluaation of this potential good feature.
