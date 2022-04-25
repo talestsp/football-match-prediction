@@ -1,5 +1,6 @@
 import pyspark.sql.functions as f
 from pyspark.sql.window import Window
+from src.utils import dflib
 
 def freq(df, colname, round_n=None):
     freq = df.groupBy(colname).agg(f.count("*").alias("Absolute"))
@@ -9,6 +10,21 @@ def freq(df, colname, round_n=None):
         freq = freq.withColumn("Relative", f.round('Relative', round_n))
         
     return freq
+
+def groupby_freq(df, groupby_cols, freq_on_col, round_n=None):
+    assert isinstance(groupby_cols, list)
+
+    groups = df.groupBy(groupby_cols + [freq_on_col]).agg(f.count("*").alias("Absolute"))
+    partial_count = groups.groupBy(groupby_cols).agg(f.sum("Absolute").alias("partial_count"))
+
+    result_df = groups.fillna("NULL").join(partial_count.fillna("NULL"), on=groupby_cols, how="inner") \
+                                     .withColumn("Relative", f.col("Absolute") / f.col("partial_count")) \
+                                     .drop("partial_count")
+
+    if round_n:
+        result_df = result_df.withColumn("Relative", f.round('Relative', round_n))
+
+    return result_df.sort(groupby_cols + [freq_on_col])
 
 def cum_sum(df, colname, order_by):
     index = df.columns
@@ -27,3 +43,41 @@ def cum_sum(df, colname, order_by):
     cumsum = cumsum_abs.join(cumsum_rel, on=index, how="outer")
 
     return cumsum.select(df.columns + [cumsum_abs_colname, cumsum_rel_colname])
+
+
+def row_mean(df, colnames, row_mean_colname, index_colname):
+    sum_df = df.select([index_colname] + colnames) \
+        .withColumn('sum',
+                    sum([f.coalesce(f.col(colname), f.lit(0)) for colname in colnames])) \
+        .select([index_colname, "sum"])
+
+    count_not_nulls_df = df.select([index_colname] + colnames) \
+        .withColumn('count_not_nulls', sum(df[colname].isNotNull().cast('float') for colname in colnames)) \
+        .select([index_colname, 'count_not_nulls'])
+
+    mean_df = sum_df.join(count_not_nulls_df, on=index_colname, how="inner")
+
+    mean_df = mean_df.withColumn(row_mean_colname, f.col('sum') / f.col('count_not_nulls')).select(
+        [index_colname, row_mean_colname])
+    return mean_df
+
+def describe(df, colname, round_n=None):
+    describe_df = df.agg(f.min(df[colname]).alias("min"),
+                      f.percentile_approx(df[colname], 0.25).alias("q_25"),
+                      f.percentile_approx(df[colname], 0.50).alias("median"),
+                      f.percentile_approx(df[colname], 0.75).alias("q_75"),
+                      f.max(df[colname]).alias("max"),
+                      f.mean(df[colname]).alias("mean"))
+
+    if round_n:
+        describe_df = dflib.round_cols(describe_df, describe_df.columns, round_n=2)
+
+    return describe_df.withColumn("column", f.lit(colname))
+
+def describe_cols(df, colnames, round_n=None):
+    describe_cols_df = describe(df, colnames[0], round_n=round_n)
+
+    for colname in colnames[1:]:
+        describe_cols_df = describe_cols_df.union(describe(df, colname, round_n=round_n))
+
+    return describe_cols_df
