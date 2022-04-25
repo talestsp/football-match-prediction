@@ -11,6 +11,21 @@ def freq(df, colname, round_n=None):
         
     return freq
 
+def groupby_freq(df, groupby_cols, freq_on_col, round_n=None):
+    assert isinstance(groupby_cols, list)
+
+    groups = df.groupBy(groupby_cols + [freq_on_col]).agg(f.count("*").alias("Absolute"))
+    partial_count = groups.groupBy(groupby_cols).agg(f.sum("Absolute").alias("partial_count"))
+
+    result_df = groups.fillna("NULL").join(partial_count.fillna("NULL"), on=groupby_cols, how="inner") \
+                                     .withColumn("Relative", f.col("Absolute") / f.col("partial_count")) \
+                                     .drop("partial_count")
+
+    if round_n:
+        result_df = result_df.withColumn("Relative", f.round('Relative', round_n))
+
+    return result_df.sort(groupby_cols + [freq_on_col])
+
 def cum_sum(df, colname, order_by):
     index = df.columns
     index.remove(colname)
