@@ -90,3 +90,11 @@ def venn(df1, df2, on_colnames, labels=None, title=None, colors=('#3c89d0', '#FF
                             }, index=["relative_freq"])
 
     pretties.display(rel_fre)
+
+
+def hist(df, colname, bins=30, color=None, figsize=(6, 3)):
+    plt.figure(figsize=figsize)
+    plt.hist(df.select(colname).toPandas(), density=False, bins=bins, color=color)
+    plt.grid(zorder=0)
+    plt.xlabel(colname)
+    plt.show()
