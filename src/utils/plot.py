@@ -4,14 +4,15 @@ import seaborn as sns
 import pandas as pd
 
 import pyspark.sql.functions as f
-from src.utils import pretties
+from src.utils import pretties, dflib
 
 PALETTE = sns.color_palette("tab10").as_hex()
 DATASETS_PAL = {'train': PALETTE[0], 'test': PALETTE[1], 'validation': PALETTE[2]}
 
 def bar(df, x, y, legend=None, title=None, x_label=None, y_label=None, color=None, alpha=1.0,
         figsize=(8, 4), plot=True, fig=None):
-    pdf = df.select([x, y]).toPandas()
+
+    pdf = dflib.df_to_dict(df, colnames=[x, y])
     use_x = pdf[x]
     use_y = pdf[y]
 
@@ -92,9 +93,31 @@ def venn(df1, df2, on_colnames, labels=None, title=None, colors=('#3c89d0', '#FF
     pretties.display(rel_fre)
 
 
-def hist(df, colname, bins=30, color=None, figsize=(6, 3)):
+def hist(df, colname, title="", ylabel="", bins=30, color=None, figsize=(6, 3)):
     plt.figure(figsize=figsize)
-    plt.hist(df.select(colname).toPandas(), density=False, bins=bins, color=color)
+    plt.hist(dflib.df_to_dict(df, colnames=[colname])[colname], density=False, bins=bins, color=color)
     plt.grid(zorder=0)
     plt.xlabel(colname)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.show()
+
+
+def hist_overlay(df, groupby_colname, histogram_colname, title="", bins=None, alpha=1, figsize=(6, 3)):
+    grouped_values = df.groupby(groupby_colname).agg(f.collect_list(histogram_colname).alias(histogram_colname))
+    grouped_values_dict = dflib.df_to_dict(grouped_values, grouped_values.columns)
+
+    plt.figure(figsize=figsize)
+
+    for i in range(len(grouped_values_dict.keys())):
+        label = grouped_values_dict[groupby_colname][i]
+        values = grouped_values_dict[histogram_colname][i]
+
+        plt.hist(values, bins=bins, alpha=alpha, label=label)
+
+    plt.grid(zorder=0)
+    plt.xlabel(histogram_colname)
+    plt.ylabel("count")
+    plt.legend(title="target")
+    plt.title(title)
     plt.show()
