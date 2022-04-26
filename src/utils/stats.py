@@ -12,7 +12,8 @@ def freq(df, colname, round_n=None):
     return freq
 
 def groupby_freq(df, groupby_cols, freq_on_col, round_n=None):
-    assert isinstance(groupby_cols, list)
+    if not isinstance(groupby_cols, list):
+        groupby_cols = [groupby_cols]
 
     groups = df.groupBy(groupby_cols + [freq_on_col]).agg(f.count("*").alias("Absolute"))
     partial_count = groups.groupBy(groupby_cols).agg(f.sum("Absolute").alias("partial_count"))
@@ -81,3 +82,17 @@ def describe_cols(df, colnames, round_n=None):
         describe_cols_df = describe_cols_df.union(describe(df, colname, round_n=round_n))
 
     return describe_cols_df
+
+def team_history_result(df, which, team_goals_cols, team_opponent_goals_cols):
+
+    for i in range(1, 11, 1):
+        team_goals_colname = team_goals_cols[i-1]
+        team_opponent_goals_colname = team_opponent_goals_cols[i-1]
+
+        team_result_history = f"{which}_result_history_{i}"
+        print(team_goals_colname)
+        df = df.withColumn(
+             team_result_history,
+             f.col(team_goals_colname) - f.col(team_opponent_goals_colname)).withColumn(
+                 team_result_history, f.when(f.col(team_result_history) > 0, "WON").otherwise(f.when(f.col(team_result_history) < 0, "LOST").otherwise(f.lit("DREW"))))
+    return df
