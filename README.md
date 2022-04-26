@@ -23,6 +23,7 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * [DataUnderstanding.ipynb](notebooks/DataUnderstanding.ipynb)
   * [SplitData.ipynb](notebooks/SplitData.ipynb)
   * [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb)
+  * [TeamHistoryAnalysis.ipynb](notebooks/TeamHistoryAnalysis.ipynb)
 
 # Data Types
 * Schema
@@ -50,3 +51,8 @@ Finally, both `home_mood_diff` and `away_mood_diff` were created.
 Yes, it doesn't need to use both to fit the model, picking one of them is enough since each one synthesizes both sides.
 
 Please, check out the [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb) notebook for the evaluaation of this potential good feature.
+
+# New Feature: team_result_history_mean
+This feature summarizes the 10 history matches.
+It replaces each team history match with 1, for a victory, with -1 for a defeat and 0 for a draw. Then a mean is calculated for these values for both home and away teams on the match. The checkou [TeamHistoryAnalysis.ipynb](notebooks/TeamHistoryAnalysis.ipynb) for more information.
+The features created are: `home_result_history_mean` and `away_result_history_mean`.

@@ -12,7 +12,8 @@ def freq(df, colname, round_n=None):
     return freq
 
 def groupby_freq(df, groupby_cols, freq_on_col, round_n=None):
-    assert isinstance(groupby_cols, list)
+    if not isinstance(groupby_cols, list):
+        groupby_cols = [groupby_cols]
 
     groups = df.groupBy(groupby_cols + [freq_on_col]).agg(f.count("*").alias("Absolute"))
     partial_count = groups.groupBy(groupby_cols).agg(f.sum("Absolute").alias("partial_count"))
