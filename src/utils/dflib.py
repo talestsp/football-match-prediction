@@ -10,3 +10,12 @@ def round_cols(df, colnames, round_n=2):
     for colname in colnames:
         df = df.withColumn(colname, f.round(colname, round_n))
     return df
+
+def df_to_dict(df, colnames):
+    lists_dict = {colname: [] for colname in colnames}
+
+    for row in df.select(colnames).collect():
+        for colname in colnames:
+            lists_dict[colname].append(row[colname])
+
+    return lists_dict
