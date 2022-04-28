@@ -7,10 +7,10 @@ import pyspark.sql.functions as f
 from src.utils import pretties, dflib
 
 PALETTE = sns.color_palette("tab10").as_hex()
-DATASETS_PAL = {'train': PALETTE[0], 'test': PALETTE[1], 'validation': PALETTE[2]}
+
 
 def bar(df, x, y, legend=None, title=None, x_label=None, y_label=None, color=None, alpha=1.0,
-        figsize=(8, 4), plot=True, fig=None):
+        figsize=(8, 4), width=0.7, plot=True, fig=None):
 
     pdf = dflib.df_to_dict(df, colnames=[x, y])
     use_x = pdf[x]
@@ -18,7 +18,7 @@ def bar(df, x, y, legend=None, title=None, x_label=None, y_label=None, color=Non
 
     fig = fig if fig else plt.figure(figsize=figsize)
 
-    plt.bar(use_x, use_y, width=5, alpha=alpha, label=legend, color=color)
+    plt.bar(use_x, use_y, width=width, alpha=alpha, label=legend, color=color)
 
     plt.xlabel(x_label) if x_label else None
     plt.ylabel(y_label) if y_label else None
@@ -93,9 +93,12 @@ def venn(df1, df2, on_colnames, labels=None, title=None, colors=('#3c89d0', '#FF
     pretties.display(rel_fre)
 
 
-def hist(df, colname, title="", ylabel="", bins=30, color=None, figsize=(6, 3)):
+def hist(df, colname, title="", ylabel="", bins=None, color=None, alpha=1, figsize=(6, 3)):
     plt.figure(figsize=figsize)
-    plt.hist(dflib.df_to_dict(df, colnames=[colname])[colname], density=False, bins=bins, color=color)
+    values = dflib.df_to_dict(df, colnames=[colname])[colname]
+    values_not_nan = [i for i in values if i]
+
+    plt.hist(values_not_nan, density=False, bins=bins, color=color, alpha=alpha)
     plt.grid(zorder=0)
     plt.xlabel(colname)
     plt.ylabel(ylabel)
@@ -121,3 +124,19 @@ def hist_overlay(df, groupby_colname, histogram_colname, title="", bins=None, al
     plt.legend(title="target")
     plt.title(title)
     plt.show()
+
+
+def scatter(df, x_colname, y_colname, title ="", color=None, alpha=1, figsize=(4, 4)):
+    n_matches_rel = dflib.df_to_dict(df, colnames=[x_colname, y_colname])
+    x = n_matches_rel[x_colname]
+    y = n_matches_rel[y_colname]
+
+    plt.figure(figsize=figsize)
+
+    plt.scatter(x=x, y=y, c=color, alpha=alpha)
+    plt.grid(zorder=0)
+    plt.xlabel(x_colname)
+    plt.ylabel(y_colname)
+    plt.title(title)
+    plt.show()
+
