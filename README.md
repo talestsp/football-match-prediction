@@ -16,6 +16,7 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * utils/
     * dflib.py
     * plot.py
+    * plot_domain.py
     * pretties.py
     * stats.py
 
@@ -24,6 +25,7 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * [SplitData.ipynb](notebooks/SplitData.ipynb)
   * [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb)
   * [TeamHistoryAnalysis.ipynb](notebooks/TeamHistoryAnalysis.ipynb)
+  * [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb)
 
 # Data Types
 * Schema
@@ -56,3 +58,9 @@ Please, check out the [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb)
 This feature summarizes the 10 history matches.
 It replaces each team history match with 1, for a victory, with -1 for a defeat and 0 for a draw. Then a mean is calculated for these values for both home and away teams on the match. The checkou [TeamHistoryAnalysis.ipynb](notebooks/TeamHistoryAnalysis.ipynb) for more information.
 The features created are: `home_result_history_mean` and `away_result_history_mean`.
+
+# New Feature: home_factor
+Let the frequency of home team victories across the whole league be the `home_factor`.
+It seems that some leagues have their peculiarities that make the home factor roughly steady over time.
+As an example, the `Copa del Rey` league has the lowest home_factor. It may happen due to its nature. In the first part of the league, the stronger team plays as away team in single match with the weaker team.
+Please check [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb) for deatils.
