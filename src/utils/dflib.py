@@ -19,3 +19,8 @@ def df_to_dict(df, colnames):
             lists_dict[colname].append(row[colname])
 
     return lists_dict
+
+def sample(df, n=1):
+    return df.orderBy(f.rand()).limit(n)
+
+
