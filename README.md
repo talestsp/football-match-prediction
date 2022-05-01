@@ -24,7 +24,7 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * [DataUnderstanding.ipynb](notebooks/DataUnderstanding.ipynb)
   * [SplitData.ipynb](notebooks/SplitData.ipynb)
   * [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb)
-  * [TeamHistoryAnalysis.ipynb](notebooks/TeamHistoryAnalysis.ipynb)
+  * [TeamHistoryResultAnalysis.ipynb](notebooks/TeamHistoryResultAnalysis.ipynb)
   * [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb)
 
 # Data Types
@@ -56,7 +56,7 @@ Please, check out the [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb)
 
 # New Feature: team_result_history_mean
 This feature summarizes the 10 history matches.
-It replaces each team history match with 1, for a victory, with -1 for a defeat and 0 for a draw. Then a mean is calculated for these values for both home and away teams on the match. The checkou [TeamHistoryAnalysis.ipynb](notebooks/TeamHistoryAnalysis.ipynb) for more information.
+It replaces each team history match with 1, for a victory, with -1 for a defeat and 0 for a draw. Then a mean is calculated for these values for both home and away teams on the match. The checkou [TeamHistoryResultAnalysis.ipynb](notebooks/TeamHistoryResultAnalysis.ipynb) for more information.
 The features created are: `home_result_history_mean` and `away_result_history_mean`.
 
 # New Feature: home_factor
@@ -64,3 +64,14 @@ Let the frequency of home team victories across the whole league be the `home_fa
 It seems that some leagues have their peculiarities that make the home factor roughly steady over time.
 As an example, the `Copa del Rey` league has the lowest home_factor. It may happen due to its nature. In the first part of the league, the stronger team plays as away team in single match with the weaker team.
 Please check [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb) for deatils.
+
+**Obs:** Check whether there is a growth trend in home_factor after the pandemic quarentine. Maybe it has grown when the audience were allowed to go back to stadiums.
+
+# Transformers
+There are three transformers built under the most relevant analysis made at Jupyter Notebooks at `notebooks/`. They are:
+
+* TeamMoodDiffTransformer
+* TeamHistoryResultTransformer
+* HomeFactorTransformer
+
+All transformers are placed at [src/ml_pipeline/transformers.py](src/ml_pipeline/transformers.py)
