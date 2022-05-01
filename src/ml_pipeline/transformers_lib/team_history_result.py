@@ -41,5 +41,15 @@ def build(df):
 
     df = _team_history_result_mean(df)
 
+    df = df.drop(*['away_result_history_1', 'away_result_history_2', 'away_result_history_3',
+                   'away_result_history_4', 'away_result_history_5', 'away_result_history_6',
+                   'away_result_history_7', 'away_result_history_8', 'away_result_history_9',
+                   'away_result_history_10'])
+
+    df = df.drop(*['home_result_history_1', 'home_result_history_2', 'home_result_history_3',
+              'home_result_history_4', 'home_result_history_5', 'home_result_history_6',
+              'home_result_history_7', 'home_result_history_8',  'home_result_history_9',
+              'home_result_history_10'])
+
     return df
 
