@@ -69,6 +69,6 @@ Please check [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb) for 
 
 # Transformers
 There are three transformers built under the most relevant analysis made at Jupyter Notebooks at `notebooks/`. They are:
- * [src/ml_pipeline/transformers_lin/home_factor.py](src/ml_pipeline/transformers_lin/home_factor.py)
- * [src/ml_pipeline/transformers_lin/team_history_result.py](src/ml_pipeline/transformers_lin/team_history_result.py)
- * [src/ml_pipeline/transformers_lin/team_mood_diff.py](src/ml_pipeline/transformers_lin/team_mood_diff.py)
+ * [src/ml_pipeline/transformers_lib/home_factor.py](src/ml_pipeline/transformers_lib/home_factor.py)
+ * [src/ml_pipeline/transformers_lib/team_history_result.py](src/ml_pipeline/transformers_lib/team_history_result.py)
+ * [src/ml_pipeline/transformers_lib/team_mood_diff.py](src/ml_pipeline/transformers_lib/team_mood_diff.py)
