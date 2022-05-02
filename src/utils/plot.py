@@ -57,10 +57,10 @@ def bar_multi(df_list, x, y, legend_list=None, title=None, x_label=None, y_label
     freq = freq.set_index("partition")
     pretties.display(freq)
 
-
 def venn(df1, df2, on_colnames, labels=None, title=None, colors=('#3c89d0', '#FFB20A'), alpha=0.5, figsize=None):
+    on_colnames = [on_colnames] if not isinstance(on_colnames, list) else on_colnames
+    on_colnames = on_colnames * 2 if len(on_colnames) == 1 else on_colnames
 
-    on_colnames = [on_colnames] * 2 if not isinstance(on_colnames, list) == 1 else on_colnames
     colname1, colname2 = on_colnames
 
     label1 = labels[0] if labels else df1.columns[0]
@@ -78,20 +78,22 @@ def venn(df1, df2, on_colnames, labels=None, title=None, colors=('#3c89d0', '#FF
     plt.title(title)
 
     venn2(subsets=(len_exclusive_set1, len_exclusive_set2, len_intersection),
-                 set_labels=(label1, label2),
-                 set_colors=colors,
-                 alpha=alpha)
+          set_labels=(label1, label2),
+          set_colors=colors,
+          alpha=alpha)
     plt.show()
 
     total = len_exclusive_set1 + len_exclusive_set2 + len_intersection
 
-    rel_fre = pd.DataFrame({f"{label1} exclusive": [round(len_exclusive_set1 / total, 4)],
-                            f"intersection": [round(len_intersection / total, 4)],
-                            f"{label2} exclusive": [round(len_exclusive_set2 / total, 4)]
-                            }, index=["relative_freq"])
+    rel_fre = pd.DataFrame({f"{label1} exclusive": [round(len_exclusive_set1 / total, 4),
+                                                    len_exclusive_set1],
+                            f"intersection": [round(len_intersection / total, 4),
+                                              len_intersection],
+                            f"{label2} exclusive": [round(len_exclusive_set2 / total, 4),
+                                                    len_exclusive_set2]
+                            }, index=["relative_freq", "absolute_freq"])
 
     pretties.display(rel_fre)
-
 
 def hist(df, colname, title="", ylabel="", bins=None, color=None, alpha=1, figsize=(6, 3)):
     plt.figure(figsize=figsize)
