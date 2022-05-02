@@ -13,6 +13,13 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
     * dao_interim.py
     * columns.py
 
+  * ml_pipeline/
+    * transformers_lib/
+      * home_factor.py
+      * team_history_result.py
+      * team_mood_diff.py
+    * transformers.py
+
   * utils/
     * dflib.py
     * plot.py
@@ -28,15 +35,16 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb)
 
 # Data Types
-* Schema
-  * All data types can be found here: data/schema.json
-* Parsing
-  * Datetime columns has been loaded as DateType
-  * Boolean data types that we originally filled with 1 and 0 were parsed to True and False
+### Schema
+All data types can be found here: data/schema.json
+### Parsing
+Datetime columns has been loaded as DateType
+Boolean data types that we originally filled with 1 and 0 were parsed to True and False
 
 # Train, Test and Validation split
 The adopted strategy for splitting train and validation datasets can be found at [SplitData.ipynb](notebooks/SplitData.ipynb) notebook. As the test dataset represents a slice made in time, the validation dataset was splitted in the same way.
-The 20% most recent data from training was partitioned to validation dataset.
+The 20% most recent data from training was partitioned to validation dataset. Then, there are three datasets here: `train_train`, `train_valid` and `test`.
+
 
 # New Feature: team_mood_diff
 The teams' rating for the current match is missing, may ratings from previous matches be useful?
@@ -65,7 +73,7 @@ It seems that some leagues have their peculiarities that make the home factor ro
 As an example, the `Copa del Rey` league has the lowest home_factor. It may happen due to its nature. In the first part of the league, the stronger team plays as away team in single match with the weaker team.
 Please check [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb) for deatils.
 
-**Obs:** Check whether there is a growth trend in home_factor after the pandemic quarentine. Maybe it has grown when the audience were allowed to go back to stadiums.
+It is relevant to be aware that this feature won't be built for `test` dataset because there is no score/target on it. The value, for each league, will be defined from `train` dataset (`train_train` and `train_valid`). In order to safely use it, an equivalence test was performed and analyzed to check whether the factor is steady from `train_train` to `train_valid` if so, we can rely that it would still be usfeul for `test` dataset.
 
 # Transformers
 There are three transformers built under the most relevant analysis made at Jupyter Notebooks at `notebooks/`. They are:
