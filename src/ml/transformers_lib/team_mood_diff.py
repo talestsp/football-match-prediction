@@ -48,6 +48,19 @@ def _team_mood(df, neutral_numeric_threshold):
     return df
 
 def build(df, neutral_numeric_threshold=0.25):
+    '''
+    Builds the following features: `home_mood_diff`, `away_mood_diff`, `home_history_mood_mean` and `away_history_mood_mean`.
+
+    For `home_history_mood_mean` and `away_history_mood_mean` is calculated, for each previous match, the difference
+    between the team and its previous opponents ratings. Then the mean is calculated over these differences
+
+    For `home_mood_diff` and `away_mood_diff` the difference between the team and its current opponent
+    team_history_mood_mean's is calculated.
+
+    :param df:
+    :param neutral_numeric_threshold:
+    :return:
+    '''
     df = _team_history_mood(df)
     df = _team_history_mood_mean(df).drop(*[
         'home_history_mood_1', 'home_history_mood_2', 'home_history_mood_3', 'home_history_mood_4',

@@ -11,13 +11,17 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
     * dao.py
     * dao_raw.py
     * dao_interim.py
+    * dao_processed.py
+    * dao_ml.py
     * columns.py
 
-  * ml_pipeline/
+  * ml/
     * transformers_lib/
       * home_factor.py
       * team_history_result.py
       * team_mood_diff.py
+    * transformers.py
+    * model_selection.py
     * transformers.py
 
   * utils/
@@ -26,6 +30,7 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
     * plot_domain.py
     * pretties.py
     * stats.py
+    * palette.py
 
 * notebooks/
   * [DataUnderstanding.ipynb](notebooks/DataUnderstanding.ipynb)
@@ -33,6 +38,9 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb)
   * [TeamHistoryResultAnalysis.ipynb](notebooks/TeamHistoryResultAnalysis.ipynb)
   * [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb)
+  * [BuildData.ipynb](notebooks/BuildData.ipynb)
+  * [ModelSelectionExperiment.ipynb](notebooks/ModelSelectionExperiment.ipynb)
+  * [ModelSelectionResults.ipynb](notebooks/ModelSelectionResults.ipynb)
 
 # Data Types
 ### Schema
@@ -76,10 +84,29 @@ Please check [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb) for 
 It is relevant to be aware that this feature won't be built for `test` dataset because there is no score/target on it. The value, for each league, will be defined from `train` dataset (`train_train` and `train_valid`). In order to safely use it, an equivalence test was performed and analyzed to check whether the factor is steady from `train_train` to `train_valid` if so, we can rely that it would still be usfeul for `test` dataset.
 
 # Transformers
-There are three transformers built under the most relevant analysis made at Jupyter Notebooks at `notebooks/`. They are:
+There are three Transformers built under the most relevant analysis made at Jupyter Notebooks at `notebooks/`. They are:
 
 * TeamMoodDiffTransformer
 * TeamHistoryResultTransformer
 * HomeFactorTransformer
 
-All transformers are placed at [src/ml_pipeline/transformers.py](src/ml_pipeline/transformers.py)
+Other Transformers were built in order to compose some eventually performed transformations on the ML Pipeline, such as:
+
+* SelectColumnsTransformer
+* DropNaTransformer
+
+**Obs**
+All the Transformers extend the `MLWritable` and `MLReadable` in order to allow its persistence.
+
+The Transformers are placed at [src/ml_pipeline/transformers.py](src/ml/transformers.py)
+
+# Build Data
+The features construction is applied for `train_train`, `train_valid` and `test` datasets in the [BuildData.ipynb](notebooks/BuildData.ipynb) notebook.
+An id and the params for this transformation are stored for further analysis.
+
+# ModelSelection (Experiment and Results)
+Two Jupyter Notebooks were created in order to build differente models and search for the best one.
+* [ModelSelectionExperiment.ipynb](notebooks/ModelSelectionExperiment.ipynb)
+  * Build RandomForestClassification models changing parameters such as ["subsampling_rate", "max_depth", "num_trees"] and by transforming training dataset with the following parameters ["missing_values_strategy", "undersampling"].
+* [ModelSelectionResults.ipynb](notebooks/ModelSelectionResults.ipynb)
+  * Build plot and reports in order to evaluate overfitting and chosse the best model, given some metrics, specially the metric used to rank challenge teams: `log_loss`.

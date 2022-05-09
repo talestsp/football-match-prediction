@@ -25,13 +25,17 @@ def _infer_cols_numeric_to_bool(spark, filepath):
             cols_numeric_to_bool.append(colname)
     return cols_numeric_to_bool
 
-def read_json(filepath):
+def save_json(json_data, filepath):
+    with open(filepath, 'w') as outfile:
+        json.dump(json_data, outfile)
+
+def load_json(filepath):
     with open(filepath) as json_file:
         data = json.load(json_file)
         return data
 
 def read_schema_json():
-    return read_json(FILEPATH_SCHEMA_JSON)
+    return load_json(FILEPATH_SCHEMA_JSON)
 
 def header_list(spark, filepath, sep=","):
     line1 = _read_1st_line(spark, filepath, sep=sep)
@@ -56,9 +60,9 @@ def _parse_numeric_to_bool(df, colnames_to_parse):
     return df
 
 def load_data(filepath, spark, header=True, sep=","):
-    colnames = header_list(spark, filepath, sep=",")
+    colnames = header_list(spark, filepath, sep=sep)
     schema = build_schema(read_schema_json(), colnames)
-    df = spark.read.format("csv").option("header", header).option("schema", schema).option("sep", sep).load(filepath)
+    df = spark.read.csv(path=filepath, header=header, schema=schema, sep=sep)
     return df
 
 def load_parse_data(filepath, spark, header=True, sep=","):

@@ -1,4 +1,7 @@
 import pyspark.sql.functions as f
+from pyspark.sql.types import StringType, DoubleType, IntegerType, LongType
+from functools import reduce
+from pyspark.sql import DataFrame
 
 def shape(df):
     return df.count(), len(df.columns)
@@ -32,4 +35,29 @@ def append_suffix_cols(df, colnames, suffix):
     rename_map = {colname : colname + suffix for colname in colnames}
     return rename_cols(df, rename_map)
 
+def split_coltypes(df, colnames="*", discard_colnames=[]):
+    colnames = list(set(colnames) - set(discard_colnames))
+    use_df = df.select(colnames)
+
+    numer_features = [f.name for f in use_df.schema.fields if isinstance(f.dataType, DoubleType) | isinstance(f.dataType, LongType) | isinstance(f.dataType, IntegerType)]
+    categ_features = [f.name for f in use_df.schema.fields if isinstance(f.dataType, StringType)]
+
+    return numer_features, categ_features
+
+def df_undersampling(df, target_colname):
+    target_count = df.groupBy(target_colname).agg(f.count("*").alias("count"))
+    min_classes_len = target_count.select(f.min("count").alias("min")).collect()[0].min
+
+    target_values = [target_value.target for target_value in df.select(target_colname).distinct().collect()]
+
+    class_df_list = []
+
+    for target_value in target_values:
+        class_df = df.filter(f.col(target_colname) == target_value)
+        class_df_resampled = sample(class_df, n=min_classes_len)
+        class_df_list.append(class_df_resampled)
+
+    df_resampled = reduce(DataFrame.unionAll, class_df_list)
+
+    return df_resampled
 
