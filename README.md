@@ -38,6 +38,9 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb)
   * [TeamHistoryResultAnalysis.ipynb](notebooks/TeamHistoryResultAnalysis.ipynb)
   * [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb)
+  * [BuildData.ipynb](notebooks/BuildData.ipynb)
+  * [ModelSelectionExperiment.ipynb](notebooks/ModelSelectionExperiment.ipynb)
+  * [ModelSelectionResults.ipynb](notebooks/ModelSelectionResults.ipynb)
 
 # Data Types
 ### Schema
