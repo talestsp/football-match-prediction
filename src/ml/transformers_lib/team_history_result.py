@@ -31,6 +31,14 @@ def _team_history_result_mean(df):
     return df
 
 def build(df):
+    '''
+    Builds `home_result_history_mean` and `away_result_history_mean` which represents the team previous 10 results.
+    Each one of these results (victory, draw or defeat) is replaced by 1, 0 and -1, respectively.
+    Then the mean is calculated over these values for both home and away teams in the match.
+
+    :param df:
+    :return:
+    '''
     df = _add_team_history_result(df, which="home",
                                   team_goals_cols=columns.home_team_history_goal_cols,
                                   team_opponent_goals_cols=columns.home_team_history_opponent_goal_cols)
