@@ -188,4 +188,13 @@
  "away_team_history_league_id_8": "StringType",
  "away_team_history_league_id_9": "StringType",
  "away_team_history_league_id_10": "StringType",
- "score": "StringType"}
+ "score": "StringType",
+ "home_mood_diff" : "FloatType",
+ "away_mood_diff" : "FloatType",
+ "home_history_mood_mean" : "FloatType",
+ "away_history_mood_mean" : "FloatType",
+ "home_result_history_mean" : "FloatType",
+ "away_result_history_mean" : "FloatType",
+ "home_factor" : "FloatType",
+ "draw_factor" : "FloatType"
+}
