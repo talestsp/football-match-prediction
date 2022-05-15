@@ -53,7 +53,7 @@ Datetime columns has been loaded as DateType
 Boolean data types that we originally filled with 1 and 0 were parsed to True and False
 
 # Train, Test and Validation split
-The adopted strategy for splitting train and validation datasets can be found at [SplitData.ipynb](notebooks/SplitData.ipynb) notebook. As the test dataset represents a slice made in time, the validation dataset was splitted in the same way.
+The adopted strategy for splitting train and validation datasets can be found at [2-SplitData.ipynb](notebooks/2-SplitData.ipynb) notebook. As the test dataset represents a slice made in time, the validation dataset was splitted in the same way.
 The 20% most recent data from training was partitioned to validation dataset. Then, there are three datasets here: `train_train`, `train_valid` and `test`.
 
 
@@ -71,18 +71,18 @@ Finally, both `home_mood_diff` and `away_mood_diff` were created.
 
 Yes, it doesn't need to use both to fit the model, picking one of them is enough since each one synthesizes both sides.
 
-Please, check out the [TeamMoodAnalysis.ipynb](notebooks/TeamMoodAnalysis.ipynb) notebook for the evaluaation of this potential good feature.
+Please, check out the [3.1-TeamMoodAnalysis.ipynb](notebooks/3.1-TeamMoodAnalysis.ipynb) notebook for the evaluaation of this potential good feature.
 
 # New Feature: team_result_history_mean
 This feature summarizes the 10 history matches.
-It replaces each team history match with 1, for a victory, with -1 for a defeat and 0 for a draw. Then a mean is calculated for these values for both home and away teams on the match. The checkou [TeamHistoryResultAnalysis.ipynb](notebooks/TeamHistoryResultAnalysis.ipynb) for more information.
+It replaces each team history match with 1, for a victory, with -1 for a defeat and 0 for a draw. Then a mean is calculated for these values for both home and away teams on the match. The checkou [3.2-TeamHistoryResultAnalysis.ipynb](notebooks/3.2-TeamHistoryResultAnalysis.ipynb) for more information.
 The features created are: `home_result_history_mean` and `away_result_history_mean`.
 
 # New Feature: home_factor
 Let the frequency of home team victories across the whole league be the `home_factor`.
 It seems that some leagues have their peculiarities that make the home factor roughly steady over time.
 As an example, the `Copa del Rey` league has the lowest home_factor. It may happen due to its nature. In the first part of the league, the stronger team plays as away team in single match with the weaker team.
-Please check [HomeFactorAnalysis.ipynb](notebooks/HomeFactorAnalysis.ipynb) for deatils.
+Please check [3.3-HomeFactorAnalysis.ipynb](notebooks/3.3-HomeFactorAnalysis.ipynb) for deatils.
 
 It is relevant to be aware that this feature won't be built for `test` dataset because there is no score/target on it. The value, for each league, will be defined from `train` dataset (`train_train` and `train_valid`). In order to safely use it, an equivalence test was performed and analyzed to check whether the factor is steady from `train_train` to `train_valid` if so, we can rely that it would still be usfeul for `test` dataset.
 
@@ -130,6 +130,7 @@ To do that, there was designed three stretegies: `uniform_proba`, `global_freque
  
 The estimator [`FillProbaEstimator`](src/ml/estimators.py) is the class that calculates the strategy values.
 This is achieved through the method `FillProbaEstimator.fit()` that returns a [`FillProbaTransformer`](src/ml/transformers.py) object.
+More information can be found at [Appendix-FillProba.ipynb](notebooks/Appendix-FillProba.ipynb)
 
 
 
