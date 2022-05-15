@@ -1,4 +1,4 @@
-from pivot.dao import dao, dao_raw
+from src.dao import dao, dao_raw
 
 INTERIM_DATA_DIR = dao.DATA_DIR + "interim/"
 FILEPATH_TRAIN_TRAIN_IDS = INTERIM_DATA_DIR + "train_train_ids.csv"

@@ -1,4 +1,4 @@
-from pivot.dao import dao
+from src.dao import dao
 
 PROCESSED_DATA_DIR = dao.DATA_DIR + "processed/"
 METADATA_PROCESSED_DATA_DIR = PROCESSED_DATA_DIR + "metadata/"
