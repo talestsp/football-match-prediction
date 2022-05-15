@@ -1,9 +1,9 @@
 from pyspark.ml import Estimator, Transformer
 from pyspark.ml.util import MLWritable, MLReadable
 from pyspark.ml.param.shared import HasInputCol, HasPredictionCol
-from pivot.ml.transformers import FillProbaTransformer, HomeFactorTransformer
-from pivot.ml.estimators_lib import fill_proba_estimator, home_factor_estimator
-from pivot.utils import dflib
+from src.ml.transformers import FillProbaTransformer, HomeFactorTransformer
+from src.ml.estimators_lib import fill_proba_estimator, home_factor_estimator
+from src.utils import dflib
 
 class FillProbaEstimator(Estimator, MLReadable, MLWritable):
     def __init__(self, strategy, labels, proba_vector_col, strategy_b=None):
@@ -28,10 +28,13 @@ class FillProbaEstimator(Estimator, MLReadable, MLWritable):
     def _fit(self, df):
         probas = fill_proba_estimator.build(df)
 
-        fill_proba_b_transformer = FillProbaTransformer(strategy=self.strategy_b,
-                                                        probas=probas,
-                                                        labels=self.labels,
-                                                        proba_vector_col=self.proba_vector_col)
+        if self.strategy_b is None:
+            fill_proba_b_transformer = None
+        else:
+            fill_proba_b_transformer = FillProbaTransformer(strategy=self.strategy_b,
+                                                            probas=probas,
+                                                            labels=self.labels,
+                                                            proba_vector_col=self.proba_vector_col)
 
         fill_proba_transformer = FillProbaTransformer(strategy=self.strategy,
                                                       probas=probas,

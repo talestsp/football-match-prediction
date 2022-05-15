@@ -1,4 +1,4 @@
-from pivot.utils import stats, dflib
+from src.utils import stats, dflib
 
 
 def _uniform_proba():
