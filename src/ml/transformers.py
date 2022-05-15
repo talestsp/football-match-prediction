@@ -1,9 +1,10 @@
 from pyspark.ml import Transformer
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.util import MLWritable, MLReadable
-from pivot.ml.transformers_lib import team_history_result, team_mood_diff
-from pivot.ml.transformers_lib import fill_proba_transformer
-from pivot.utils import dflib
+from pyspark.sql import functions as f
+from src.ml.transformers_lib import team_history_result, team_mood_diff
+from src.ml.transformers_lib import fill_proba_transformer
+from src.utils import dflib, stats
 from pyspark.sql.types import DoubleType
 
 # https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.Transformer.html#pyspark.ml.Transformer.transform
@@ -140,49 +141,26 @@ class FillProbaTransformer(Transformer, MLReadable, MLWritable):
         self.strategy_b_transformer = strategy_b_transformer
 
     def _transform(self, df):
-        print("strategy IN", self.strategy)
         df_not_null = df.dropna(how="any", subset=[self.proba_vector_col])
-        df_proba_null = dflib.filter_any_null(df=df, subset=[self.proba_vector_col])
+        df_preds_null = dflib.filter_any_null(df=df, subset=[self.proba_vector_col])
 
-        print("df_not_null", dflib.shape(df_not_null))
-        print("df_any_null", dflib.shape(df_proba_null))
+        if df_preds_null.count() == 0:
+            return df
 
-        df_proba_null = fill_proba_transformer.build(df=df_proba_null,
-                                                   proba=self.probas[self.strategy],
-                                                   strategy=self.strategy)
-
-        df_proba_null = VectorAssembler(inputCols=self.labels,
-                                      outputCol=self.proba_vector_col) \
-                        .transform(df_proba_null.drop(*[self.proba_vector_col]))
+        df_preds_null = fill_proba_transformer.build(df=df_preds_null,
+                                                     proba=self.probas[self.strategy],
+                                                     strategy=self.strategy)
 
         if not self.strategy_b_transformer is None:
-            df_proba_null = self.strategy_b_transformer.transform(df_proba_null)
+            df_preds_null = self.strategy_b_transformer.transform(df_preds_null)
 
-        df = df_not_null.uion(df_proba_null.select(df_not_null.columns))
-        print("strategy DONE", self.strategy)
+        df_preds_null = VectorAssembler(inputCols=self.labels,
+                                        outputCol=self.proba_vector_col) \
+                            .transform(df_preds_null.drop(*[self.proba_vector_col]))
+
+        df = df_not_null.union(df_preds_null.select(df_not_null.columns))
+
         return df
 
     def get_params(self):
         return {"strategy": self.strategy}
-
-
-############################################################################################
-################################### DEPRECATED #############################################
-############################################################################################
-
-# class HomeFactorTransformer_DEPRECATED(Transformer, MLReadable, MLWritable):
-#     def __init__(self, spark=None, is_train=False, colnames="*"):
-#         super().__init__()
-#         self.spark = spark
-#         self.is_train = is_train
-#         self.colnames = colnames
-#
-#     def _transform(self, df):
-#         print("HomeFactorTransformer")
-#         df_transformed = home_factor.build(df=df.select(self.colnames),
-#                                            is_train=self.is_train,
-#                                            spark=self.spark)
-#         return df_transformed
-#
-#     def get_params(self):
-#         return {"colnames": self.colnames}
