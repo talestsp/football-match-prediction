@@ -38,22 +38,27 @@ def get_metrics(predictions, labelCol="target_indexed", predictionCol="predictio
                                          evaluator.metricLabel: 2})
     # print("recall_away", recall_away)
 
-    f1_home = evaluator.evaluate(predictions,
-                                        {evaluator.metricName: "fMeasureByLabel",
-                                         evaluator.metricLabel: 0})
-    # print("f1_home", f1_home)
-    f1_draw = evaluator.evaluate(predictions,
-                                        {evaluator.metricName: "fMeasureByLabel",
-                                         evaluator.metricLabel: 1})
-    # print("f1_draw", f1_draw)
-    f1_away = evaluator.evaluate(predictions,
-                                        {evaluator.metricName: "fMeasureByLabel",
-                                         evaluator.metricLabel: 2})
-    # print("f1_away", f1_away)
+    # f1_home = evaluator.evaluate(predictions,
+    #                                     {evaluator.metricName: "fMeasureByLabel",
+    #                                      evaluator.metricLabel: 0})
+    # # print("f1_home", f1_home)
+    # f1_draw = evaluator.evaluate(predictions,
+    #                                     {evaluator.metricName: "fMeasureByLabel",
+    #                                      evaluator.metricLabel: 1})
+    # # print("f1_draw", f1_draw)
+    # f1_away = evaluator.evaluate(predictions,
+    #                                     {evaluator.metricName: "fMeasureByLabel",
+    #                                      evaluator.metricLabel: 2})
+    # # print("f1_away", f1_away)
+
+    # metrics_dict = {"accuracy": accuracy, "log_loss": log_loss, "precision_home": precision_home,
+    #                 "precision_draw": precision_draw, "precision_away": precision_away, "recall_home": recall_home,
+    #                 "recall_draw": recall_draw, "recall_away": recall_away, "f1_home": f1_home,
+    #                 "f1_draw": f1_draw, "f1_away": f1_away}
 
     metrics_dict = {"accuracy": accuracy, "log_loss": log_loss, "precision_home": precision_home,
                     "precision_draw": precision_draw, "precision_away": precision_away, "recall_home": recall_home,
-                    "recall_draw": recall_draw, "recall_away": recall_away, "f1_home": f1_home,
-                    "f1_draw": f1_draw, "f1_away": f1_away}
+                    "recall_draw": recall_draw, "recall_away": recall_away}
+
 
     return metrics_dict

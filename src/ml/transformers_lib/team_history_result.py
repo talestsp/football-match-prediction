@@ -1,6 +1,6 @@
 import pyspark.sql.functions as f
-from src.dao import columns
-from src.utils import stats
+from pivot.dao import columns
+from pivot.utils import stats
 
 def _add_team_history_result(df, which, team_goals_cols, team_opponent_goals_cols):
     for i in range(1, 11, 1):

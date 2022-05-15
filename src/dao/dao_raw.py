@@ -1,4 +1,4 @@
-from src.dao import dao
+from pivot.dao import dao
 
 RAW_DATA_DIR = dao.DATA_DIR + "raw/"
 FILEPATH_TRAIN = RAW_DATA_DIR + "train.csv"

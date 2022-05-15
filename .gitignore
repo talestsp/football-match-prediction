@@ -17,6 +17,10 @@ __pycache__
 *.idea
 
 data/results/*
+data/preds/*
+data/processed/*
+models/*
+
 
 
 # C extensions

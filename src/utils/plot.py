@@ -4,7 +4,7 @@ import seaborn as sns
 import pandas as pd
 
 import pyspark.sql.functions as f
-from src.utils import pretties, dflib
+from pivot.utils import pretties, dflib
 
 PALETTE = sns.color_palette("tab10").as_hex()
 
