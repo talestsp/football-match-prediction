@@ -37,13 +37,13 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
     * palette.py
 
 * notebooks/
-  * [1 - DataUnderstanding.ipynb.ipynb](notebooks/1 - DataUnderstanding.ipynb.ipynb)
-  * [2 - SplitData.ipynb.ipynb](notebooks/2 - SplitData.ipynb.ipynb)
-  * [3.1 - TeamMoodAnalysis.ipynb.ipynb](notebooks/3.1 - TeamMoodAnalysis.ipynb.ipynb)
-  * [3.2 - TeamHistoryResultAnalysis.ipynb.ipynb](notebooks/3.2 - TeamHistoryResultAnalysis.ipynb.ipynb)
-  * [3.3 - HomeFactorAnalysis.ipynb.ipynb](notebooks/3.3 - HomeFactorAnalysis.ipynb.ipynb)
-  * [4 - BuildData.ipynb.ipynb](notebooks/4 - BuildData.ipynb.ipynb)
-  * [Appendix - FillProba.ipynb](notebooks/Appendix - FillProba.ipynb)
+  * [1-DataUnderstanding.ipynb.ipynb](notebooks/1-DataUnderstanding.ipynb.ipynb)
+  * [2-SplitData.ipynb.ipynb](notebooks/2-SplitData.ipynb.ipynb)
+  * [3.1-TeamMoodAnalysis.ipynb.ipynb](notebooks/3.1-TeamMoodAnalysis.ipynb.ipynb)
+  * [3.2-TeamHistoryResultAnalysis.ipynb.ipynb](notebooks/3.2-TeamHistoryResultAnalysis.ipynb.ipynb)
+  * [3.3-HomeFactorAnalysis.ipynb.ipynb](notebooks/3.3-HomeFactorAnalysis.ipynb.ipynb)
+  * [4-BuildData.ipynb.ipynb](notebooks/4-BuildData.ipynb.ipynb)
+  * [Appendix-FillProba.ipynb](notebooks/Appendix-FillProba.ipynb)
 
 # Data Types
 ### Schema
