@@ -1,6 +1,6 @@
-import pyspark.sql.functions as f
-from src.dao import dao_interim
 from src.utils import stats
+import pyspark.sql.functions as f
+
 
 def _role_factor(df, which_role):
     target_freq = stats.groupby_freq(df, groupby_cols="league_id", freq_on_col="target", round_n=4).drop(*["target", "Absolute"])
@@ -8,7 +8,7 @@ def _role_factor(df, which_role):
     role_freq = role_freq.withColumn(f"{which_role}_factor", f.col("Relative")).drop(*["Relative"])
     return role_freq
 
-def build(df, spark):
+def build(df):
     '''
     Builds home_factor and draw_factor features.
     * home_factor represents the relative frequency of victories for home playing teams for each league.
@@ -20,18 +20,8 @@ def build(df, spark):
     :return:
     '''
 
-    if not "target" in df.columns:
-        print("Loading home_factor and draw_factor for whole train dataset.")
-        factors = dao_interim.load_home_factor_whole_train(spark=spark, header=True)
-        df = df.join(factors, on="league_id", how="left")
+    home_factor = _role_factor(df, which_role="home")
+    draw_factor = _role_factor(df, which_role="draw")
+    n_matches = df.groupBy("league_id").agg(f.count("*").alias("n_matches"))
 
-    else:
-        home_factor = _role_factor(df, which_role="home")
-        draw_factor = _role_factor(df, which_role="draw")
-        n_matches = df.groupBy("league_id").agg(f.count("*").alias("n_matches"))
-
-        df = df.join(home_factor, on="league_id", how="left") \
-               .join(draw_factor, on="league_id", how="left") \
-               .join(n_matches, on="league_id", how="left")
-
-    return df
+    return home_factor, draw_factor, n_matches

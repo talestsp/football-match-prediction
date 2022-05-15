@@ -2,6 +2,7 @@ import pyspark.sql.functions as f
 from pyspark.sql.types import StringType, DoubleType, IntegerType, LongType
 from functools import reduce
 from pyspark.sql import DataFrame
+import pyspark.sql.functions as psf
 
 def shape(df):
     return df.count(), len(df.columns)
@@ -60,4 +61,24 @@ def df_undersampling(df, target_colname):
     df_resampled = reduce(DataFrame.unionAll, class_df_list)
 
     return df_resampled
+
+def filter_any_null(df, subset=None):
+    if subset is None:
+        subset = df.columns
+
+    cols = [f.col(c) for c in subset]
+    filter_expr = reduce(lambda a, b: a | b.isNull(), cols[1:], cols[0].isNull())
+    return df.filter(filter_expr)
+
+def proba_to_predicted_target(df, proba_colnames):
+    COND = "psf.when" + ".when".join(
+        ["(psf.col('" + c + "') == psf.col('prediction_str'), psf.lit('" + c + "'))" for c in
+         proba_colnames])
+
+    df = df.withColumn("prediction_str",
+                       psf.greatest(*proba_colnames)).withColumn("prediction_str", eval(COND))
+
+    return df
+
+
 
