@@ -1,8 +1,8 @@
 import pyspark.sql.functions as f
-from pyspark.sql.types import StringType, DoubleType, IntegerType, LongType
+from pyspark.sql.types import StringType, DoubleType, IntegerType, LongType, BooleanType
 from functools import reduce
 from pyspark.sql import DataFrame
-import pyspark.sql.functions as psf
+import pyspark.ml.functions as psf
 
 def shape(df):
     return df.count(), len(df.columns)
@@ -37,10 +37,13 @@ def append_suffix_cols(df, colnames, suffix):
     return rename_cols(df, rename_map)
 
 def split_coltypes(df, colnames="*", discard_colnames=[]):
+    if colnames == "*":
+        colnames = df.columns
+
     colnames = list(set(colnames) - set(discard_colnames))
     use_df = df.select(colnames)
 
-    numer_features = [f.name for f in use_df.schema.fields if isinstance(f.dataType, DoubleType) | isinstance(f.dataType, LongType) | isinstance(f.dataType, IntegerType)]
+    numer_features = [f.name for f in use_df.schema.fields if isinstance(f.dataType, DoubleType) | isinstance(f.dataType, LongType) | isinstance(f.dataType, IntegerType) | isinstance(f.dataType, BooleanType)]
     categ_features = [f.name for f in use_df.schema.fields if isinstance(f.dataType, StringType)]
 
     return numer_features, categ_features
@@ -49,7 +52,7 @@ def df_undersampling(df, target_colname):
     target_count = df.groupBy(target_colname).agg(f.count("*").alias("count"))
     min_classes_len = target_count.select(f.min("count").alias("min")).collect()[0].min
 
-    target_values = [target_value.target for target_value in df.select(target_colname).distinct().collect()]
+    target_values = [target_value[target_colname] for target_value in df.select(target_colname).distinct().collect()]
 
     class_df_list = []
 
@@ -70,13 +73,17 @@ def filter_any_null(df, subset=None):
     filter_expr = reduce(lambda a, b: a | b.isNull(), cols[1:], cols[0].isNull())
     return df.filter(filter_expr)
 
-def proba_to_predicted_target(df, proba_colnames):
-    COND = "psf.when" + ".when".join(
-        ["(psf.col('" + c + "') == psf.col('prediction_str'), psf.lit('" + c + "'))" for c in
+def dense_vector_to_columns(df, dense_vector_colname, new_colnames):
+    return df.withColumn("xs", psf.vector_to_array(dense_vector_colname)).select(
+        ["*"] + [f.col("xs")[i].alias(new_colnames[i]) for i in range(len(new_colnames))]).drop(*["xs"])
+
+def proba_to_predicted_target(df, target_colname, proba_colnames):
+    cond = "f.when" + ".when".join(
+        ["(f.col('" + c + "') == f.col('" + target_colname + "'), f.lit('" + c + "'))" for c in
          proba_colnames])
 
-    df = df.withColumn("prediction_str",
-                       psf.greatest(*proba_colnames)).withColumn("prediction_str", eval(COND))
+    df = df.withColumn(target_colname,
+                       f.greatest(*proba_colnames)).withColumn(target_colname, eval(cond))
 
     return df
 
