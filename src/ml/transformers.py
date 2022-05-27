@@ -1,11 +1,9 @@
 from pyspark.ml import Transformer
-from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.feature import VectorAssembler, StringIndexer
 from pyspark.ml.util import MLWritable, MLReadable
 from pyspark.sql import functions as f
-from src.ml.transformers_lib import team_history_result, team_mood_diff
-from src.ml.transformers_lib import fill_proba_transformer
+from src.ml.transformers_lib import team_history_result, team_mood_diff, fill_proba_transformer
 from src.utils import dflib, stats
-from pyspark.sql.types import DoubleType
 
 # https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.Transformer.html#pyspark.ml.Transformer.transform
 # https://stackoverflow.com/questions/49734374/pyspark-ml-pipelines-are-custom-transformers-necessary-for-basic-preprocessing
@@ -19,7 +17,6 @@ class TeamMoodDiffTransformer(Transformer, MLReadable, MLWritable):
         self.colnames = colnames
 
     def _transform(self, df):
-        print("TeamMoodDiffTransformer")
         use_df = df.select(self.colnames)
         df_transformed = team_mood_diff.build(use_df, self.neutral_numeric_threshold)
         return df_transformed
@@ -34,33 +31,27 @@ class TeamHistoryResultTransformer(Transformer, MLReadable, MLWritable):
         self.colnames = colnames
 
     def _transform(self, df):
-        print("TeamHistoryResultTransformer")
         use_df = df.select(self.colnames)
         df_transformed = team_history_result.build(use_df)
         return df_transformed
 
     def get_params(self):
-        return {"colnames": self.colnames}
+        return {}
 
 class HomeFactorTransformer(Transformer, MLReadable, MLWritable):
-    def __init__(self, home_factor, draw_factor, n_matches, colnames="*"):
+    def __init__(self, role_factors, n_matches_min=1, colnames="*"):
         super().__init__()
-        self.home_factor = home_factor
-        self.draw_factor = draw_factor
-        self.n_matches = n_matches
+        self.role_factors = role_factors
+        self.n_matches_min = n_matches_min
         self.colnames = colnames
 
     def _transform(self, df):
-        print("HomeFactorTransformer")
-
-        df_transformed = df.join(self.home_factor, on="league_id", how="left") \
-                           .join(self.draw_factor, on="league_id", how="left") \
-                           .join(self.n_matches, on="league_id", how="left")
+        df_transformed = df.join(self.role_factors, on="league_id", how="left")
 
         return df_transformed
 
     def get_params(self):
-        return {}
+        return {"n_matches_min": self.n_matches_min}
 
 
 class SelectColumnsTransformer(Transformer, MLReadable, MLWritable):
@@ -72,8 +63,6 @@ class SelectColumnsTransformer(Transformer, MLReadable, MLWritable):
         self.keep_colnames = keep_colnames
 
     def _transform(self, df, numer_features=None):
-        print("SelectColumnsTransformer")
-
         if not numer_features:
             numer_features, categ_features = dflib.split_coltypes(df, colnames=self.subset_colnames)
 
@@ -82,6 +71,7 @@ class SelectColumnsTransformer(Transformer, MLReadable, MLWritable):
         if not "target" in df.columns:
             select_colnames.remove("target")
 
+        df = df.select(select_colnames)
         return df
 
     def get_params(self):
@@ -90,9 +80,10 @@ class SelectColumnsTransformer(Transformer, MLReadable, MLWritable):
 
 
 class DropNaTransformer(Transformer, MLReadable, MLWritable):
-    def __init__(self):
+    def __init__(self, subset=None, drop_report=False):
         super().__init__()
-        pass
+        self.subset = subset
+        self.drop_report = drop_report
 
     def _drop_report(self, len_df, len_df_dropna):
         n_dropped_rows = len_df - len_df_dropna
@@ -100,19 +91,50 @@ class DropNaTransformer(Transformer, MLReadable, MLWritable):
 
         print(f'{len_df} before')
         print(f'{len_df_dropna} after')
-
         print(f'{n_dropped_rows} rows dropped ({percent_dropped_rows:.2f}%)')
 
-    def _transform(self, df, drop_report=False):
-        print("DropNaTransformer")
-        df_dropped = df.dropna(how="any")
+    def _transform(self, df):
+        if self.subset is None:
+            subset = df.columns
+        else:
+            subset = self.subset
 
-        if drop_report:
+        df_dropped = df.dropna(how="any", subset=subset)
+
+        if self.drop_report:
             len_df = df.count()
             len_df_dropna = df_dropped.count()
             self._drop_report(len_df, len_df_dropna)
 
         return df_dropped
+
+    def get_params(self):
+        return {"subset": self.subset}
+
+
+class ProbaVectorToPrediction(Transformer, MLReadable, MLWritable):
+    def __init__(self, target_transformer, prediction_col, dense_vector_colname):
+        super().__init__()
+        self.target_transformer = target_transformer
+        self.prediction_col = prediction_col
+        self.dense_vector_colname = dense_vector_colname
+
+    def _transform(self, df):
+
+        df = dflib.dense_vector_to_columns(df=df,
+                                           dense_vector_colname=self.dense_vector_colname,
+                                           new_colnames=self.target_transformer.labels)
+
+        df = dflib.proba_to_predicted_target(df=df,
+                                             target_colname=self.prediction_col + "_str",
+                                             proba_colnames=self.target_transformer.labels)
+
+        prediction_indexer = StringIndexer(inputCol=self.prediction_col + "_str",
+                                           outputCol=self.prediction_col,
+                                           stringOrderType=self.target_transformer.getStringOrderType()).fit(df)
+
+        df = prediction_indexer.transform(df)
+        return df
 
     def get_params(self):
         return {}
@@ -124,8 +146,7 @@ class UndersamplingTransformer(Transformer, MLReadable, MLWritable):
         self.target_colname = target_colname
 
     def _transform(self, df):
-        print("UndersamplingTransformer")
-        return dflib.df_undersampling(df, self.target_colname)
+       return dflib.df_undersampling(df, self.target_colname)
 
     def get_params(self):
         return {}
@@ -141,8 +162,13 @@ class FillProbaTransformer(Transformer, MLReadable, MLWritable):
         self.strategy_b_transformer = strategy_b_transformer
 
     def _transform(self, df):
-        df_not_null = df.dropna(how="any", subset=[self.proba_vector_col])
-        df_preds_null = dflib.filter_any_null(df=df, subset=[self.proba_vector_col])
+        if self.proba_vector_col in df.columns:
+            df_not_null = df.dropna(how="any", subset=[self.proba_vector_col])
+            df_preds_null = dflib.filter_any_null(df=df, subset=[self.proba_vector_col])
+
+        else:
+            df_not_null = None
+            df_preds_null = df
 
         if df_preds_null.count() == 0:
             return df
@@ -158,7 +184,10 @@ class FillProbaTransformer(Transformer, MLReadable, MLWritable):
                                         outputCol=self.proba_vector_col) \
                             .transform(df_preds_null.drop(*[self.proba_vector_col]))
 
-        df = df_not_null.union(df_preds_null.select(df_not_null.columns))
+        if df_not_null is None:
+            df = df_preds_null
+        else:
+            df = df_not_null.union(df_preds_null.select(df_not_null.columns))
 
         return df
 
