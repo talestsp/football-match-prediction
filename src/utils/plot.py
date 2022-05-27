@@ -10,7 +10,7 @@ PALETTE = sns.color_palette("tab10").as_hex()
 
 
 def bar(df, x, y, legend=None, title=None, x_label=None, y_label=None, color=None, alpha=1.0,
-        figsize=(8, 4), width=0.7, plot=True, fig=None):
+        figsize=(8, 4), width=2.5, plot=True, fig=None):
 
     pdf = dflib.df_to_dict(df, colnames=[x, y])
     use_x = pdf[x]
