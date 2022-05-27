@@ -53,7 +53,7 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * [6.1-ExperimentRandomForest.ipynb](notebooks/6.1-ExperimentRandomForest.ipynb)
   * [6.2-ExperimentXGBoost.ipynb](notebooks/6.2-ExperimentXGBoost.ipynb)
   * [7.1-ResultAnalysis.ipynb](notebooks/7.1-ResultAnalysis.ipynb)
-  * [7.2-ModelSelectionAndPrediction.ipynb](notebooks/7.2-ModelSelectionAndPrediction.ipynb)  
+  * [8-BuildBestModelAndPredict.ipynb.ipynb](notebooks/8-BuildBestModelAndPredict.ipynb.ipynb)  
   * [Appendix-FillProba.ipynb](notebooks/Appendix-FillProba.ipynb)
 
 # Data Types
@@ -191,7 +191,9 @@ It is not fair to compare their Cross-Validation results because the dataset the
 The score comparison between models fitted with and withou class balacing is assessed by evaluating predictions over the `tvalid` dataset. The missing values strategy is also evaluated with it.
 This final evaluation is performed in the  [7.2-ModelSelectionAndPrediction.ipynb/](notebooks/7.2-ModelSelectionAndPrediction.ipynb) jupyter notebook.
 
-
+# Prediction
+The best model performance, according to the experiment notebooks, are re-built and applied to `test` dataset in the [8-BuildBestModelAndPredict.ipynb](notebooks/8-BuildBestModelAndPredict.ipynb) notebooks.
+It also builds the submission file to be evaluated at Kaggle.
 
 
 
