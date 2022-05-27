@@ -54,7 +54,7 @@ Most of the work here was made with PySpark.
   * [6.1-ExperimentRandomForest.ipynb](notebooks/6.1-ExperimentRandomForest.ipynb)
   * [6.2-ExperimentXGBoost.ipynb](notebooks/6.2-ExperimentXGBoost.ipynb)
   * [7.1-ResultAnalysis.ipynb](notebooks/7.1-ResultAnalysis.ipynb)
-  * [8-BuildBestModelAndPredict.ipynb.ipynb](notebooks/8-BuildBestModelAndPredict.ipynb.ipynb)  
+  * [8-BuildBestModelAndPredict.ipynb](notebooks/8-BuildBestModelAndPredict.ipynb)  
   * [Appendix-FillProba.ipynb](notebooks/Appendix-FillProba.ipynb)
 
 # Data Types
