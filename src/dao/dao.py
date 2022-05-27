@@ -1,5 +1,7 @@
 import json
+import sys, inspect
 from pyspark.sql.types import StructField, StringType, StructType, DateType, BooleanType, IntegerType, FloatType
+from pyspark.sql.functions import col
 
 DATA_DIR = "data/"
 FILEPATH_SCHEMA_JSON = "data/schema.json"
@@ -68,7 +70,23 @@ def load_data(filepath, spark, header=True, sep=","):
 def load_parse_data(filepath, spark, header=True, sep=","):
     df = load_data(filepath, spark, header=header, sep=sep)
     df = _parse_numeric_to_bool(df, colnames_to_parse=_infer_cols_numeric_to_bool(spark, filepath))
+    if "is_cup" in df.columns:
+        df = df.withColumn("is_cup", df.is_cup.cast(BooleanType()))
+        df = df.withColumn("is_cup", col("is_cup").cast("integer"))
+
     return df
 
 def save_data(df, filepath, sep=","):
     df.write.format('com.databricks.spark.csv').mode('overwrite').option("header", "true").option("sep", sep).save(filepath)
+
+def get_package_from(obj):
+    mod = inspect.getmodule(obj)
+    base, _sep, _stem = mod.__name__.partition('.')
+    return str(sys.modules[base]).replace("\'", "").replace("\"", "")
+
+
+
+
+
+
+
