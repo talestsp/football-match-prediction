@@ -5,6 +5,10 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
 * data/
   * raw/     <- The original, immutable data dump
   * interim/  <- Intermediate data that has been transformed
+  * processes/ <- Final data (with feature engineering stages applied)
+  * preds/ <- Test predictions are stored here
+  * feature_selection/ <- Features selected and its correlation with target
+  * results/ <- Data from Cross-Validation Grid Search experiments are stored here.
 
 * src/
   * dao/
@@ -17,16 +21,16 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
 
   * ml/
     * estimators_lib/
+      * home_factor_estimator.py
+      * fill_proba_estimator.py
     * transformers_lib/
-      * home_factor.py
       * team_history_result.py
       * team_mood_diff.py
       * fill_proba_transformer.py
     * estimators.py
-      * home_factor_estimator.py
-      * fill_proba_estimator.py
-    * model_selection.py
     * transformers.py
+    * metrics.py
+    * missin_values.py
 
   * utils/
     * dflib.py
@@ -42,7 +46,14 @@ Repository to work on [Kaggle's Football Match Probability Prediction challenge]
   * [3.1-TeamMoodAnalysis.ipynb](notebooks/3.1-TeamMoodAnalysis.ipynb)
   * [3.2-TeamHistoryResultAnalysis.ipynb](notebooks/3.2-TeamHistoryResultAnalysis.ipynb)
   * [3.3-HomeFactorAnalysis.ipynb](notebooks/3.3-HomeFactorAnalysis.ipynb)
-  * [4-BuildData.ipynb](notebooks/4-BuildData.ipynb)
+  * [4.1-BuildData.ipynb](notebooks/4.1-BuildData.ipynb)
+  * [4.2-FeatureSelection.ipynb](notebooks/4.2-FeatureSelection.ipynb)
+  * [4.3-MissingValues.ipynb](notebooks/4.3-MissingValues.ipynb)
+  * [5-Baselines.ipynb](notebooks/5-Baselines.ipynb)
+  * [6.1-ExperimentRandomForest.ipynb](notebooks/6.1-ExperimentRandomForest.ipynb)
+  * [6.2-ExperimentXGBoost.ipynb](notebooks/6.2-ExperimentXGBoost.ipynb)
+  * [7.1-ResultAnalysis.ipynb](notebooks/7.1-ResultAnalysis.ipynb)
+  * [7.2-ModelSelectionAndPrediction.ipynb](notebooks/7.2-ModelSelectionAndPrediction.ipynb)  
   * [Appendix-FillProba.ipynb](notebooks/Appendix-FillProba.ipynb)
 
 # Data Types
@@ -103,18 +114,32 @@ All the Transformers extend the `MLWritable` and `MLReadable` in order to allow 
 
 The Transformers are placed at [src/ml_pipeline/transformers.py](src/ml/transformers.py)
 
-# Missing Values
-Matches with missing values aren't applied to prediction model.
+# Build Data
+The features construction is applied for `train_train`, `train_valid` and `test` datasets in the [BuildData.ipynb](notebooks/4.1-BuildData.ipynb) notebook using the Transformers commented before. The processed data is stored with an id associated to it.
+
+# Feature Selection
+The feature selection was made in two steps:
+  * ANOVA's F Statistic between numerical features and target
+  * Mutually correlated features analysis
+    * For each pair of mutual highly correlated features (threshold above Pearson's 0.9) the one with lower correlation with target was discarded.
+
+  More details of it can be found at [4.2-FeatureSelection.ipynb](notebokos/4.2-FeatureSelection.ipynb)
+
+# Missing Values Analysis
+Matches with missing values in features aren't applied to prediction model. It is relevant to assess the quality of the data on this matter.
+You can check this summary analysis in [4.3-MissingValues.ipynb](notebooks/4.3-MissingValues.ipynb).
+
 There are two ways to overcome this problem: 
  * filling missing values on predictors (independent variables)
  * filling missing values on prediction (dependent variable)
 
-Following the holistic strategy of doing simple things first, it will be preffered to start filling missing values on prediction.
+Following the holistic strategy of doing simple things first, it will be preffered to start with simple strategies.
 
-### Missing Values on Predictors
-<i>Not yet implemented.</i>>
+### Missing Values on Predictors (indepedent variables)
+Feature median value imputation was applied to all features for those matches with missing values.
+An interesting strategy of filling missing values with the mean of similar matches will be done later.
 
-### Missing Values on Prediction
+### Missing Values on Prediction  (depedent variable)
 Once the prediction is calculated for all rows (matches) with all valid values, the matches with invalid (null) values also need to have the prediction probability.
 
 To do that, there was designed three stretegies: `uniform_proba`, `global_frequency` and `league_frequency`.
@@ -131,6 +156,42 @@ To do that, there was designed three stretegies: `uniform_proba`, `global_freque
 The estimator [`FillProbaEstimator`](src/ml/estimators.py) is the class that calculates the strategy values.
 This is achieved through the method `FillProbaEstimator.fit()` that returns a [`FillProbaTransformer`](src/ml/transformers.py) object.
 More information can be found at [Appendix-FillProba.ipynb](notebooks/Appendix-FillProba.ipynb)
+
+# Baselines
+It is a good practice to start a Machine Learning project with one or more scored baseline approaches.
+It represent the scores reached by simple strategies with no intelligent effort.
+The chosen baseline strategies were the ones presented in <b>Missing Values on Prediction</b> section: `uniform_proba`, `global_frequency` and `league_frequency`.
+
+Check notebook [5-Baselines.ipynb](notebooks/5-Baselines.ipynb) for details.
+
+# Modeling and Inference
+Model Selection (also known as Model Tuning) is the process of finding the set of parameters (over a collection of them) that yields the best score.
+
+In this stage the concern is about having a model with a good learning (able to apply relevant identified patterns) and a good generalization (able to perform well on unseen data).
+
+To do this experiment and save the results, the following jupyter notebooks were used. Both notebooks executes Cross-Validation strategy with K-Fold splits under a Grid Search heuristic.
+
+ * [6.1-ExperimentRandomForest.ipynb](notebooks/6.1-ExperimentRandomForest.ipynb)
+ * [6.2-ExperimentXGBoost.ipynb](notebooks/6.2-ExperimentXGBoost.ipynb)
+
+The data used on Cross-Validation is the training data with no missing values on feature set. As fitting and validating datasets come from the the same Cross-Validation input dataset, it is not a good idea to let synthetically filled data points compose this input data. They must be excluded from it.
+
+As the `test` dataset has also features with missing values, some strategy to work on it must be used. The notebook 7.2-ModelSelectionAndPrediction is used to experiment the missing values approaches that was mentioned before.
+
+<b>Feature Importances</b>
+The relevance of each feature, stated by the best model, is also shown in the Experiments notebook. 
+
+<b>Overfitting Analysis</b>
+A table with the train and cross-validation metrics (for each parameter configuration) is also calculated and stored in order to leverage further knowledge/insights for future iterations. A brief overfitting analysis can be found at 7.1-ResultAnalysis.
+
+In the experiment stages, the Cross-Validation was performed in two types of training data, both without missing values. They come from the same `ttrain` dataset, but one of them have all target classes balanced.
+
+It is not fair to compare their Cross-Validation results because the dataset the input dataset is not the same. Then the `tvalid` dataset is used.
+
+The score comparison between models fitted with and withou class balacing is assessed by evaluating predictions over the `tvalid` dataset. The missing values strategy is also evaluated with it.
+This final evaluation is performed in the  [7.2-ModelSelectionAndPrediction.ipynb/](notebooks/7.2-ModelSelectionAndPrediction.ipynb) jupyter notebook.
+
+
 
 
 
