@@ -50,10 +50,11 @@ class FillProbaEstimator(Estimator, MLReadable, MLWritable):
         return {"proba_vector_col": self.proba_vector_col}
 
 class HomeFactorEstimator(Estimator, MLReadable, MLWritable):
-    def __init__(self):
+    def __init__(self, n_matches_min=1):
         super().__init__()
+        self.n_matches_min = n_matches_min
 
     def _fit(self, df):
-        home_factor, draw_factor, n_matches = home_factor_estimator.build(df)
+        role_factors = home_factor_estimator.build(df, n_matches_min=self.n_matches_min)
 
-        return HomeFactorTransformer(home_factor=home_factor, draw_factor=draw_factor, n_matches=n_matches)
+        return HomeFactorTransformer(role_factors=role_factors, n_matches_min=self.n_matches_min)

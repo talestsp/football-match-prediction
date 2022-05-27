@@ -20,7 +20,8 @@ data/results/*
 data/preds/*
 data/processed/*
 models/*
-
+data/modeling/*.json
+data/feature_selection/*.json
 
 
 # C extensions

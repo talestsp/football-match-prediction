@@ -8,7 +8,7 @@ def _role_factor(df, which_role):
     role_freq = role_freq.withColumn(f"{which_role}_factor", f.col("Relative")).drop(*["Relative"])
     return role_freq
 
-def build(df):
+def build(df, n_matches_min):
     '''
     Builds home_factor and draw_factor features.
     * home_factor represents the relative frequency of victories for home playing teams for each league.
@@ -20,8 +20,11 @@ def build(df):
     :return:
     '''
 
+    n_matches = df.groupBy("league_id").agg(f.count("*").alias("n_matches"))
     home_factor = _role_factor(df, which_role="home")
     draw_factor = _role_factor(df, which_role="draw")
-    n_matches = df.groupBy("league_id").agg(f.count("*").alias("n_matches"))
 
-    return home_factor, draw_factor, n_matches
+    role_factors = n_matches.join(home_factor, on="league_id", how="left") \
+                            .join(draw_factor, on="league_id", how="left")
+
+    return role_factors.filter(f.col("n_matches") >= n_matches_min)
