@@ -4,6 +4,7 @@ from pyspark.ml.util import MLWritable, MLReadable
 from pyspark.sql import functions as f
 from src.ml.transformers_lib import team_history_result, team_mood_diff, fill_proba_transformer
 from src.utils import dflib, stats
+import datetime as datetime_
 
 # https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.Transformer.html#pyspark.ml.Transformer.transform
 # https://stackoverflow.com/questions/49734374/pyspark-ml-pipelines-are-custom-transformers-necessary-for-basic-preprocessing
@@ -193,3 +194,40 @@ class FillProbaTransformer(Transformer, MLReadable, MLWritable):
 
     def get_params(self):
         return {"strategy": self.strategy}
+
+class DateFilterTransformer(Transformer, MLReadable, MLWritable):
+
+    def __init__(self, dt_colname, from_dt=None, to_dt=None):
+        super().__init__()
+        self.dt_colname = dt_colname
+        self.from_dt = from_dt
+        self.to_dt = to_dt
+
+    def __get_date(self, df, which):
+        if which == "max":
+            dt = df.select(f.max("match_date").alias("match_date")).collect()[0].match_date
+        elif which == "min":
+            dt = df.select(f.min("match_date").alias("match_date")).collect()[0].match_date
+
+        if isinstance(dt, str):
+            return dt
+        elif isinstance(dt, datetime_.date):
+            return dt.strftime(format="%Y-%m-%d %H:%M:%S")
+
+    def _transform(self, df):
+        if self.from_dt is None:
+            from_dt = self.__get_date(df, "min")
+        else:
+            from_dt = self.from_dt
+
+        if self.to_dt is None:
+            to_dt = self.__get_date(df, "max")
+        else:
+            to_dt = self.to_dt
+
+        return df.filter((f.col(self.dt_colname) >= from_dt) & (f.col(self.dt_colname) <= to_dt))
+
+    def get_params(self):
+        return {"dt_colname": self.dt_colname,
+                "from_dt": self.from_dt,
+                "to_dt": self.to_dt}

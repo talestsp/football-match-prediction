@@ -54,7 +54,7 @@ def build_overfitting_analysis_df_spark_ml(df_train, cv_model, cross_valid, eval
 def get_feature_importances(clf, features):
     package_data = dao.get_package_from(clf).split()
 
-    if "xgboost" in package_data:
+    if "xgboost" in package_data or "lightgbm" in package_data:
         importances = clf.feature_importances_
 
     elif "pyspark" in package_data:
