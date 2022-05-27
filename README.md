@@ -1,5 +1,6 @@
 # football-match-prediction
 Repository to work on [Kaggle's Football Match Probability Prediction challenge](https://www.kaggle.com/competitions/football-match-probability-prediction/).
+Most of the work here was made with PySpark.
 
 # Project Structure
 * data/
@@ -194,6 +195,31 @@ This final evaluation is performed in the  [7.2-ModelSelectionAndPrediction.ipyn
 # Prediction
 The best model performance, according to the experiment notebooks, are re-built and applied to `test` dataset in the [8-BuildBestModelAndPredict.ipynb](notebooks/8-BuildBestModelAndPredict.ipynb) notebooks.
 It also builds the submission file to be evaluated at Kaggle.
+
+# Future Work
+This project was made within a month by me, starting with simple approach and then improving.
+Unfortunately I started it when the competition was about to finish and I am not in the learderboard.
+The score I got with this code is enough to be in the top 50%.
+If I had more time to work on it, I would do the following.
+
+  * Missing Values Imputation with Similar Matches.
+    * The two most relevant features have around 8.5% os missing values in the `test` dataset. 
+    * They were filled with global median values, but they can have a better filling strategy considering similar data points (matches).
+
+  * More Feature Engineering
+    * This is one the most relevant effort in Machine Learning. All the used features here were built from the original ones.
+    * There are lots of interesting new features that can be tried here. I would begin with coach win rate.
+    * Maybe aggregating the current features to the month of the year is a good try. The leagues are seasonal and due to climate Season of the rules of the competitions, some aspects may change.
+
+  * Another Learning Algorithms
+    * I have used two simple ones: RandomForest and XGBoost classifiers. Maybe an LSTM or even a LGBM would be improve score.
+    * Stack Ensembles is also agood try.
+
+  * The overfitting analysis can be found in the notebook [7.1-ResultAnalysis.ipynb](notebooks/7.1-ResultAnalysis.ipynb) and can leverage new insights to add on Grid Search parameters.
+
+So, these are the efforts that I would have done if I had more time :)
+
+Thank you 
 
 
 
