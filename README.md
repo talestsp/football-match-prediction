@@ -53,7 +53,7 @@ Most of the work here was made with PySpark.
   * [5-Baselines.ipynb](notebooks/5-Baselines.ipynb)
   * [6.1-ExperimentRandomForest.ipynb](notebooks/6.1-ExperimentRandomForest.ipynb)
   * [6.2-ExperimentXGBoost.ipynb](notebooks/6.2-ExperimentXGBoost.ipynb)
-  * [7.1-ResultAnalysis.ipynb](notebooks/7.1-ResultAnalysis.ipynb)
+  * [7-ResultAnalysis.ipynb](notebooks/7-ResultAnalysis.ipynb)
   * [8-BuildBestModelAndPredict.ipynb](notebooks/8-BuildBestModelAndPredict.ipynb)  
   * [Appendix-FillProba.ipynb](notebooks/Appendix-FillProba.ipynb)
 
@@ -189,9 +189,6 @@ In the experiment stages, the Cross-Validation was performed in two types of tra
 
 It is not fair to compare their Cross-Validation results because the dataset the input dataset is not the same. Then the `tvalid` dataset is used.
 
-The score comparison between models fitted with and withou class balacing is assessed by evaluating predictions over the `tvalid` dataset. The missing values strategy is also evaluated with it.
-This final evaluation is performed in the  [7.2-ModelSelectionAndPrediction.ipynb/](notebooks/7.2-ModelSelectionAndPrediction.ipynb) jupyter notebook.
-
 # Prediction
 The best model performance, according to the experiment notebooks, are re-built and applied to `test` dataset in the [8-BuildBestModelAndPredict.ipynb](notebooks/8-BuildBestModelAndPredict.ipynb) notebooks.
 It also builds the submission file to be evaluated at Kaggle.
@@ -215,7 +212,7 @@ If I had more time to work on it, I would do the following.
     * I have used two simple ones: RandomForest and XGBoost classifiers. Maybe an LSTM or even a LGBM would be improve score.
     * Stack Ensembles is also agood try.
 
-  * The overfitting analysis can be found in the notebook [7.1-ResultAnalysis.ipynb](notebooks/7.1-ResultAnalysis.ipynb) and can leverage new insights to add on Grid Search parameters.
+  * The overfitting analysis can be found in the notebook [7-ResultAnalysis.ipynb](notebooks/7-ResultAnalysis.ipynb) and can leverage new insights to add on Grid Search parameters.
 
 So, these are the efforts that I would have done if I had more time :)
 
